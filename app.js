@@ -28,6 +28,7 @@ function normalizeRecipe(recipe) {
     id: recipe.id,
     name: recipe.name || "未命名食谱",
     category: recipe.category || "其他",
+    overnightPrep: Boolean(recipe.overnightPrep),
     ingredients: recipe.ingredients || [],
     steps,
     notes: recipe.notes || ""
@@ -58,7 +59,7 @@ function clearStoredToken() {
 
 function githubHeaders(token = "") {
   const headers = {
-    "Accept": "application/vnd.github+json",
+    Accept: "application/vnd.github+json",
     "X-GitHub-Api-Version": "2022-11-28"
   };
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -75,7 +76,9 @@ function encodeBase64Utf8(value) {
   const bytes = new TextEncoder().encode(value);
   let binary = "";
   const chunk = 0x8000;
-  for (let i = 0; i < bytes.length; i += chunk) binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  for (let i = 0; i < bytes.length; i += chunk) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  }
   return btoa(binary);
 }
 
@@ -99,7 +102,12 @@ async function githubWriteJson(path, value, sha, message, token = getStoredToken
   const res = await fetch(`${API_BASE}/${path}`, {
     method: "PUT",
     headers: { ...githubHeaders(token), "Content-Type": "application/json" },
-    body: JSON.stringify({ message, content: encodeBase64Utf8(content), sha, branch: "main" })
+    body: JSON.stringify({
+      message,
+      content: encodeBase64Utf8(content),
+      sha,
+      branch: "main"
+    })
   });
   if (!res.ok) {
     if (res.status === 409 || res.status === 422) throw new Error("CONFLICT");
@@ -118,7 +126,7 @@ async function loadData() {
     ]);
     categories = categoryData.json;
     allRecipes = recipeData.json.map(normalizeRecipe);
-  } catch (error) {
+  } catch {
     const stamp = Date.now();
     const [categoriesRes, recipesRes] = await Promise.all([
       fetch(`data/categories.json?fresh=${stamp}`, { cache: "no-store" }),
@@ -155,6 +163,7 @@ function renderCategories() {
     };
     categoryTabs.appendChild(button);
   });
+
   const add = document.createElement("button");
   add.className = "category-tab add-tab";
   add.textContent = "+";
@@ -169,17 +178,32 @@ function renderRecipes() {
     const text = [recipe.name, recipe.category, ...(recipe.ingredients || [])].join(" ").toLowerCase();
     return categoryMatch && text.includes(query);
   });
+
   sectionTitle.textContent = activeCategory === "全部" ? "全部食谱" : activeCategory;
   recipeCount.textContent = `${filtered.length} 个食谱`;
   recipeGrid.innerHTML = "";
+
   filtered.forEach(recipe => {
+    const overnightPill = recipe.overnightPrep ? `<span class="pill">需过夜准备</span>` : "";
     const card = document.createElement("button");
     card.className = "recipe-card";
-    card.innerHTML = `<div class="recipe-card-main"><h3>${escapeHtml(recipe.name)}</h3><div class="meta-row"><span class="pill">${escapeHtml(recipe.category)}</span><span class="pill">${totalMinutes(recipe)} 分钟</span></div></div><span class="chevron">›</span>`;
+    card.innerHTML = `
+      <div class="recipe-card-main">
+        <h3>${escapeHtml(recipe.name)}</h3>
+        <div class="meta-row">
+          <span class="pill">${escapeHtml(recipe.category)}</span>
+          <span class="pill">${totalMinutes(recipe)} 分钟</span>
+          ${overnightPill}
+        </div>
+      </div>
+      <span class="chevron">›</span>`;
     card.onclick = () => openRecipe(recipe.id);
     recipeGrid.appendChild(card);
   });
-  if (!filtered.length) recipeGrid.innerHTML = `<p class="muted">没有找到符合条件的食谱。</p>`;
+
+  if (!filtered.length) {
+    recipeGrid.innerHTML = `<p class="muted">没有找到符合条件的食谱。</p>`;
+  }
 }
 
 function openRecipe(id) {
@@ -187,9 +211,16 @@ function openRecipe(id) {
   if (!selectedRecipe) return;
   byId("detailCategory").textContent = selectedRecipe.category;
   byId("detailName").textContent = selectedRecipe.name;
-  byId("detailMeta").innerHTML = `<span class="pill">总用时 ${totalMinutes(selectedRecipe)} 分钟</span>`;
-  byId("detailIngredients").innerHTML = (selectedRecipe.ingredients || []).map(x => `<li>${escapeHtml(x)}</li>`).join("") || "<li>暂无配料</li>";
-  byId("detailSteps").innerHTML = (selectedRecipe.steps || []).map((step, index) => `<div class="detail-step"><span class="step-number">${index + 1}</span><div><p>${escapeHtml(step.text || "")}</p><small>${Number(step.minutes) || 0} 分钟</small></div></div>`).join("") || "<p class='muted'>暂无步骤</p>";
+  byId("detailMeta").innerHTML = `
+    <span class="pill">总用时 ${totalMinutes(selectedRecipe)} 分钟</span>
+    ${selectedRecipe.overnightPrep ? '<span class="pill">需过夜准备</span>' : ""}`;
+  byId("detailIngredients").innerHTML = (selectedRecipe.ingredients || [])
+    .map(x => `<li>${escapeHtml(x)}</li>`).join("") || "<li>暂无配料</li>";
+  byId("detailSteps").innerHTML = (selectedRecipe.steps || []).map((step, index) => `
+    <div class="detail-step">
+      <span class="step-number">${index + 1}</span>
+      <div><p>${escapeHtml(step.text || "")}</p><small>${Number(step.minutes) || 0} 分钟</small></div>
+    </div>`).join("") || "<p class='muted'>暂无步骤</p>";
   byId("detailNotes").textContent = selectedRecipe.notes || "暂无备注";
   recipeDialog.showModal();
 }
@@ -199,6 +230,7 @@ function openEditor(recipe = null) {
   byId("editorTitle").textContent = recipe ? "编辑食谱" : "新增食谱";
   populateCategorySelect(recipe?.category);
   byId("recipeName").value = recipe?.name || "";
+  byId("recipeOvernight").value = recipe?.overnightPrep ? "true" : "false";
   byId("recipeIngredients").value = (recipe?.ingredients || []).join("\n");
   byId("recipeNotes").value = recipe?.notes || "";
   byId("deleteRecipe").classList.toggle("hidden", !recipe);
@@ -217,9 +249,16 @@ function renderStepsEditor(steps) {
 function addStepRow(text = "", minutes = 0, index = null) {
   const row = document.createElement("div");
   row.className = "step-row";
-  row.innerHTML = `<span class="step-index">${index !== null ? index + 1 : ""}</span><textarea class="step-text" rows="2" placeholder="写这一步要做什么…">${escapeHtml(text)}</textarea><div class="step-time"><input class="step-minutes" type="number" min="0" inputmode="numeric" value="${minutes}" /><span>分钟</span></div><button type="button" class="remove-step" aria-label="删除这一步">×</button>`;
+  row.innerHTML = `
+    <span class="step-index">${index !== null ? index + 1 : ""}</span>
+    <textarea class="step-text" rows="2" placeholder="写这一步要做什么…">${escapeHtml(text)}</textarea>
+    <div class="step-time"><input class="step-minutes" type="number" min="0" inputmode="numeric" value="${minutes}" /><span>分钟</span></div>
+    <button type="button" class="remove-step" aria-label="删除这一步">×</button>`;
   row.querySelector(".step-minutes").addEventListener("input", updateStepNumbersAndTotal);
-  row.querySelector(".remove-step").onclick = () => { row.remove(); updateStepNumbersAndTotal(); };
+  row.querySelector(".remove-step").onclick = () => {
+    row.remove();
+    updateStepNumbersAndTotal();
+  };
   byId("stepsEditor").appendChild(row);
 }
 
@@ -234,16 +273,21 @@ function updateStepNumbersAndTotal() {
 }
 
 function collectSteps() {
-  return [...document.querySelectorAll(".step-row")].map(row => ({
-    text: row.querySelector(".step-text").value.trim(),
-    minutes: Number(row.querySelector(".step-minutes").value) || 0
-  })).filter(step => step.text || step.minutes);
+  return [...document.querySelectorAll(".step-row")]
+    .map(row => ({
+      text: row.querySelector(".step-text").value.trim(),
+      minutes: Number(row.querySelector(".step-minutes").value) || 0
+    }))
+    .filter(step => step.text || step.minutes);
 }
 
 function populateCategorySelect(selected = null) {
   const select = byId("recipeCategory");
   if (!select) return;
-  select.innerHTML = categories.filter(c => c !== "全部").map(c => `<option ${c === selected ? "selected" : ""}>${escapeHtml(c)}</option>`).join("");
+  select.innerHTML = categories
+    .filter(c => c !== "全部")
+    .map(c => `<option ${c === selected ? "selected" : ""}>${escapeHtml(c)}</option>`)
+    .join("");
 }
 
 function formToRecipe() {
@@ -251,6 +295,7 @@ function formToRecipe() {
     id: editingId || slugify(byId("recipeName").value) + "-" + Date.now().toString().slice(-5),
     name: byId("recipeName").value.trim(),
     category: byId("recipeCategory").value,
+    overnightPrep: byId("recipeOvernight").value === "true",
     ingredients: lines(byId("recipeIngredients").value),
     steps: collectSteps(),
     notes: byId("recipeNotes").value.trim()
@@ -303,7 +348,8 @@ async function renameCategory(oldName, newName) {
     githubReadJson("data/recipes.json", token, true),
     githubReadJson("data/categories.json", token, true)
   ]);
-  const nextRecipes = latestRecipes.json.map(normalizeRecipe).map(r => r.category === oldName ? { ...r, category: newName } : r);
+  const nextRecipes = latestRecipes.json.map(normalizeRecipe)
+    .map(r => r.category === oldName ? { ...r, category: newName } : r);
   const nextCategories = latestCategories.json.map(c => c === oldName ? newName : c);
   await githubWriteJson("data/recipes.json", nextRecipes, latestRecipes.sha, `Rename category in recipes: ${oldName} to ${newName}`, token);
   try {
@@ -316,7 +362,12 @@ async function renameCategory(oldName, newName) {
 
 function renderCategoryManager() {
   const container = byId("categoryManager");
-  container.innerHTML = categories.filter(c => c !== "全部").map((c, index) => `<div class="category-row" data-index="${index + 1}"><span>☰</span><input value="${escapeAttr(c)}" aria-label="分类名称"/><button class="mini-delete">删除</button></div>`).join("");
+  if (!container) return;
+  container.innerHTML = categories.filter(c => c !== "全部").map((c, index) => `
+    <div class="category-row" data-index="${index + 1}">
+      <span>☰</span><input value="${escapeAttr(c)}" aria-label="分类名称"/><button class="mini-delete">删除</button>
+    </div>`).join("");
+
   container.querySelectorAll(".category-row").forEach(row => {
     const input = row.querySelector("input");
     input.onchange = async () => {
@@ -325,7 +376,10 @@ function renderCategoryManager() {
       const next = input.value.trim();
       if (!next || next === old) return;
       if (!requireConnection()) { input.value = old; return; }
-      if (categories.includes(next)) { input.value = old; return showMessage("分类已存在", "请换一个分类名称。" ); }
+      if (categories.includes(next)) {
+        input.value = old;
+        return showMessage("分类已存在", "请换一个分类名称。" );
+      }
       input.disabled = true;
       try {
         const result = await renameCategory(old, next);
@@ -340,10 +394,13 @@ function renderCategoryManager() {
         input.disabled = false;
       }
     };
+
     row.querySelector(".mini-delete").onclick = async () => {
       const idx = Number(row.dataset.index);
       const name = categories[idx];
-      if (allRecipes.some(r => r.category === name)) return showMessage("暂时不能删除", "这个分类下还有食谱，请先把食谱改到其他分类。" );
+      if (allRecipes.some(r => r.category === name)) {
+        return showMessage("暂时不能删除", "这个分类下还有食谱，请先把食谱改到其他分类。" );
+      }
       if (!requireConnection()) return;
       try {
         const next = categories.filter(c => c !== name);
@@ -363,57 +420,62 @@ function openCategoryManager() {
   categoryDialog.showModal();
 }
 
+function openSettings() {
+  const token = getStoredToken();
+  byId("githubToken").value = token;
+  byId("rememberToken").checked = localStorage.getItem(TOKEN_MODE_KEY) === "local";
+  refreshConnectionStatus();
+  settingsDialog.showModal();
+}
+
+function refreshConnectionStatus(ok = null) {
+  const el = byId("connectionStatus");
+  if (!el) return;
+  if (ok === true) {
+    el.textContent = "已连接";
+    return;
+  }
+  el.textContent = getStoredToken() ? "已保存连接信息" : "尚未连接";
+}
+
 function showMessage(title, text) {
   byId("dialogTitle").textContent = title;
   byId("dialogText").textContent = text;
   messageDialog.showModal();
 }
 
-function lines(value) { return value.split("\n").map(x => x.trim()).filter(Boolean); }
-function slugify(value) { return value.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-\u4e00-\u9fff]/g, ""); }
-function escapeHtml(value = "") { return String(value).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
-function escapeAttr(value = "") { return escapeHtml(value); }
+function lines(value) {
+  return value.split("\n").map(x => x.trim()).filter(Boolean);
+}
 
-function refreshConnectionStatus() {
-  const connected = Boolean(getStoredToken());
-  byId("connectionStatus").textContent = connected ? "已连接" : "尚未连接";
-  byId("githubToken").value = "";
-  byId("rememberToken").checked = localStorage.getItem(TOKEN_MODE_KEY) === "local";
+function slugify(value) {
+  return value.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^\w\-\u4e00-\u9fff]/g, "");
+}
+
+function escapeHtml(value = "") {
+  return String(value).replace(/[&<>'"]/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
+  }[c]));
+}
+
+function escapeAttr(value = "") {
+  return escapeHtml(value);
 }
 
 searchInput?.addEventListener("input", renderRecipes);
 byId("manageCategories")?.addEventListener("click", openCategoryManager);
 byId("closeCategories")?.addEventListener("click", () => categoryDialog.close());
 byId("closeRecipe")?.addEventListener("click", () => recipeDialog.close());
-byId("editRecipe")?.addEventListener("click", () => { recipeDialog.close(); openEditor(selectedRecipe); });
-byId("cancelEditor")?.addEventListener("click", () => editorDialog.close());
-byId("closeDialog")?.addEventListener("click", () => messageDialog.close());
-byId("closeSettings")?.addEventListener("click", () => settingsDialog.close());
-byId("addStepButton")?.addEventListener("click", () => { addStepRow(); updateStepNumbersAndTotal(); });
-
-byId("testGithubConnection")?.addEventListener("click", async () => {
-  const token = byId("githubToken").value.trim() || getStoredToken();
-  if (!token) return showMessage("请输入 token", "请先粘贴 token。" );
-  const button = byId("testGithubConnection");
-  button.disabled = true;
-  button.textContent = "正在测试…";
-  try {
-    await githubReadJson("data/recipes.json", token, true);
-    storeToken(token, byId("rememberToken").checked);
-    refreshConnectionStatus();
-    showMessage("连接成功", "设置已保存，现在可以正常新增、编辑和删除食谱。" );
-  } catch (error) {
-    showMessage("连接失败", friendlyError(error));
-  } finally {
-    button.disabled = false;
-    button.textContent = "测试并保存连接";
-  }
+byId("editRecipe")?.addEventListener("click", () => {
+  recipeDialog.close();
+  openEditor(selectedRecipe);
 });
-
-byId("forgetGithubConnection")?.addEventListener("click", () => {
-  clearStoredToken();
-  refreshConnectionStatus();
-  showMessage("已清除", "这台设备上的连接信息已清除。" );
+byId("cancelEditor")?.addEventListener("click", () => editorDialog.close());
+byId("closeSettings")?.addEventListener("click", () => settingsDialog.close());
+byId("closeDialog")?.addEventListener("click", () => messageDialog.close());
+byId("addStepButton")?.addEventListener("click", () => {
+  addStepRow();
+  updateStepNumbersAndTotal();
 });
 
 byId("addCategoryButton")?.addEventListener("click", async () => {
@@ -421,20 +483,15 @@ byId("addCategoryButton")?.addEventListener("click", async () => {
   const name = input.value.trim();
   if (!name || categories.includes(name)) return;
   if (!requireConnection()) return;
-  const button = byId("addCategoryButton");
-  button.disabled = true;
   try {
-    const latest = await githubReadJson("data/categories.json", getStoredToken(), true);
-    const next = latest.json.includes(name) ? latest.json : [...latest.json, name];
-    await githubWriteJson("data/categories.json", next, latest.sha, `Add category: ${name}`);
+    const next = [...categories, name];
+    await saveCategories(next, `Add category: ${name}`);
     categories = next;
     input.value = "";
     renderAll();
-    showMessage("已保存", "新分类已添加。" );
+    showMessage("已保存", "分类已添加。" );
   } catch (error) {
     showMessage("保存失败", friendlyError(error));
-  } finally {
-    button.disabled = false;
   }
 });
 
@@ -446,14 +503,16 @@ byId("recipeForm")?.addEventListener("submit", async event => {
   const button = byId("saveRecipeButton");
   button.disabled = true;
   button.textContent = "保存中…";
-  byId("saveStatus").textContent = "";
+  byId("saveStatus").textContent = "正在保存…";
   try {
     allRecipes = await saveRecipe(recipe);
-    editorDialog.close();
+    selectedRecipe = allRecipes.find(r => r.id === recipe.id) || null;
     renderAll();
+    byId("saveStatus").textContent = "保存成功";
+    editorDialog.close();
     showMessage("保存成功", "食谱已保存。" );
   } catch (error) {
-    byId("saveStatus").textContent = friendlyError(error);
+    byId("saveStatus").textContent = "保存失败";
     showMessage("保存失败", friendlyError(error));
   } finally {
     button.disabled = false;
@@ -463,15 +522,17 @@ byId("recipeForm")?.addEventListener("submit", async event => {
 
 byId("deleteRecipe")?.addEventListener("click", async () => {
   if (!editingId || !requireConnection()) return;
-  const recipe = allRecipes.find(r => r.id === editingId);
-  if (!recipe) return;
+  const existing = allRecipes.find(r => r.id === editingId);
+  if (!existing) return;
   const button = byId("deleteRecipe");
   button.disabled = true;
   button.textContent = "删除中…";
   try {
-    allRecipes = await deleteRecipe(editingId, recipe.name);
-    editorDialog.close();
+    allRecipes = await deleteRecipe(editingId, existing.name);
+    selectedRecipe = null;
+    editingId = null;
     renderAll();
+    editorDialog.close();
     showMessage("删除成功", "食谱已删除。" );
   } catch (error) {
     showMessage("删除失败", friendlyError(error));
@@ -481,16 +542,41 @@ byId("deleteRecipe")?.addEventListener("click", async () => {
   }
 });
 
+byId("testGithubConnection")?.addEventListener("click", async () => {
+  const token = byId("githubToken").value.trim();
+  if (!token) return showMessage("缺少连接信息", "请先粘贴 token。" );
+  const button = byId("testGithubConnection");
+  button.disabled = true;
+  button.textContent = "测试中…";
+  try {
+    await githubReadJson("data/recipes.json", token, true);
+    storeToken(token, byId("rememberToken").checked);
+    refreshConnectionStatus(true);
+    await loadData();
+    showMessage("连接成功", "现在可以保存和编辑食谱了。" );
+  } catch (error) {
+    showMessage("连接失败", friendlyError(error));
+  } finally {
+    button.disabled = false;
+    button.textContent = "测试并保存连接";
+  }
+});
+
+byId("forgetGithubConnection")?.addEventListener("click", () => {
+  clearStoredToken();
+  byId("githubToken").value = "";
+  byId("rememberToken").checked = false;
+  refreshConnectionStatus();
+  showMessage("已清除", "这台设备上的连接信息已清除。" );
+});
+
 document.querySelectorAll(".nav-item").forEach(button => {
   button.addEventListener("click", () => {
     const action = button.dataset.action;
     if (action === "home") return window.scrollTo({ top: 0, behavior: "smooth" });
     if (action === "search") return searchInput.focus();
     if (action === "add") return openEditor();
-    if (action === "settings") {
-      refreshConnectionStatus();
-      settingsDialog.showModal();
-    }
+    if (action === "settings") return openSettings();
   });
 });
 
