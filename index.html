@@ -8,12 +8,12 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>BakeBook</title>
-  <link rel="stylesheet" href="style.css?v=7" />
+  <link rel="stylesheet" href="style.css?v=8" />
 </head>
 <body>
   <main class="app-shell">
     <header class="topbar">
-      <div><p class="eyebrow">我的烘焙食谱 · OCR v7</p><h1>BakeBook</h1></div>
+      <div><p class="eyebrow">我的烘焙食谱</p><h1>BakeBook</h1></div>
       <button class="icon-btn" id="manageCategories" aria-label="管理分类">⚙︎</button>
     </header>
 
@@ -45,31 +45,12 @@
   <dialog id="editorDialog" class="sheet-dialog">
     <form id="recipeForm" class="sheet-card form-card">
       <div class="sheet-head"><button type="button" class="text-btn" id="cancelEditor">取消</button><strong id="editorTitle">新增食谱</strong><span></span></div>
-
-      <section id="importSection" class="import-box">
-        <strong>从配方图片识别 · 本地 OCR</strong>
-        <p>选择视频截图、食谱截图或手写配方。文字识别直接在你的浏览器里运行，不需要付费 AI API。</p>
-        <label class="upload-btn">选择配方图片<input id="recipeImageInput" type="file" accept="image/*" hidden /></label>
-        <div id="imageFileName" class="muted"></div>
-        <button type="button" class="secondary-btn" id="recognizeImage">开始本地 OCR</button>
-        <div id="ocrProgress" class="ocr-progress hidden"><div id="ocrProgressBar"></div></div>
-        <p id="ocrStatus" class="ocr-status hidden"></p>
-        <div id="ocrResultWrap" class="ocr-result hidden">
-          <label>识别出的原始文字
-            <textarea id="ocrRawText" rows="9" placeholder="OCR 结果会显示在这里，你可以先修改错字。"></textarea>
-          </label>
-          <button type="button" class="secondary-btn" id="organizeOcrText">整理到食谱表单</button>
-        </div>
-      </section>
-
       <label>食谱名称<input id="recipeName" required placeholder="例如：糯米吐司" /></label>
       <label>分类<select id="recipeCategory"></select></label>
       <label>总用时<div class="readonly-time"><strong id="totalTime">0</strong> 分钟 <span>（根据下面步骤自动计算）</span></div></label>
       <label>配料<textarea id="recipeIngredients" rows="8" placeholder="每行一种配料，例如：高粉 500g"></textarea></label>
-
       <div class="steps-head"><strong>制作步骤</strong><button type="button" class="small-add" id="addStepButton">＋ 添加一步</button></div>
       <div id="stepsEditor" class="steps-editor"></div>
-
       <label>备注<textarea id="recipeNotes" rows="4" placeholder="例如：下次牛奶减少 10g…"></textarea></label>
       <p class="save-hint">现在仍是页面预览。下一步接入安全写入接口后，保存会同步到 GitHub。</p>
       <button class="primary-btn" type="submit">保存</button>
@@ -88,7 +69,6 @@
 
   <dialog id="messageDialog"><div class="dialog-card"><h3 id="dialogTitle">提示</h3><p id="dialogText"></p><button id="closeDialog">知道了</button></div></dialog>
 
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <script src="app.js?v=7" defer></script>
+  <script src="app.js?v=8" defer></script>
 </body>
 </html>
