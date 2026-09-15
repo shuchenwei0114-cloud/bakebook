@@ -24,31 +24,5 @@
       }
     ],
     "notes": ""
-  },
-  {
-    "id": "blueberry-muffins",
-    "name": "蓝莓玛芬",
-    "category": "玛芬",
-    "ingredients": [
-      "面粉",
-      "蓝莓",
-      "牛奶",
-      "鸡蛋"
-    ],
-    "steps": [
-      {
-        "text": "混合湿性材料",
-        "minutes": 5
-      },
-      {
-        "text": "加入干性材料并拌入蓝莓",
-        "minutes": 10
-      },
-      {
-        "text": "烘烤",
-        "minutes": 20
-      }
-    ],
-    "notes": ""
   }
 ]
