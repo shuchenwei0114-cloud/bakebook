@@ -1,30 +1,5 @@
 [
   {
-    "id": "matcha-cookies",
-    "name": "抹茶饼干",
-    "category": "饼干",
-    "ingredients": [
-      "120g 面粉",
-      "8g 抹茶粉",
-      "80g 黄油"
-    ],
-    "steps": [
-      {
-        "text": "混合干性材料",
-        "minutes": 5
-      },
-      {
-        "text": "加入黄油拌匀并整形",
-        "minutes": 15
-      },
-      {
-        "text": "烘烤",
-        "minutes": 20
-      }
-    ],
-    "notes": ""
-  },
-  {
     "id": "basque-cheesecake",
     "name": "巴斯克芝士蛋糕",
     "category": "芝士蛋糕",
