@@ -5,13 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#f7efe7" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>BakeBook</title>
-  <link rel="stylesheet" href="style.css?v=6" />
+  <link rel="stylesheet" href="style.css?v=7" />
 </head>
 <body>
   <main class="app-shell">
     <header class="topbar">
-      <div><p class="eyebrow">我的烘焙食谱</p><h1>BakeBook</h1></div>
+      <div><p class="eyebrow">我的烘焙食谱 · OCR v7</p><h1>BakeBook</h1></div>
       <button class="icon-btn" id="manageCategories" aria-label="管理分类">⚙︎</button>
     </header>
 
@@ -45,8 +47,8 @@
       <div class="sheet-head"><button type="button" class="text-btn" id="cancelEditor">取消</button><strong id="editorTitle">新增食谱</strong><span></span></div>
 
       <section id="importSection" class="import-box">
-        <strong>从配方图片识别</strong>
-        <p>选择视频截图、食谱截图或手写配方。文字识别会直接在你的浏览器里运行，图片不会上传到我们的服务器。</p>
+        <strong>从配方图片识别 · 本地 OCR</strong>
+        <p>选择视频截图、食谱截图或手写配方。文字识别直接在你的浏览器里运行，不需要付费 AI API。</p>
         <label class="upload-btn">选择配方图片<input id="recipeImageInput" type="file" accept="image/*" hidden /></label>
         <div id="imageFileName" class="muted"></div>
         <button type="button" class="secondary-btn" id="recognizeImage">开始本地 OCR</button>
@@ -87,6 +89,6 @@
   <dialog id="messageDialog"><div class="dialog-card"><h3 id="dialogTitle">提示</h3><p id="dialogText"></p><button id="closeDialog">知道了</button></div></dialog>
 
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <script src="app.js?v=6" defer></script>
+  <script src="app.js?v=7" defer></script>
 </body>
 </html>
