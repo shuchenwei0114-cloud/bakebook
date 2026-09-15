@@ -1,0 +1,46 @@
+[
+  {
+    "id": "banana-bread",
+    "name": "香蕉面包",
+    "category": "面包",
+    "time": "60 分钟",
+    "difficulty": "简单",
+    "image": "",
+    "ingredients": ["2 根熟香蕉", "200g 面粉", "2 个鸡蛋"],
+    "steps": ["压碎香蕉", "混合材料", "175°C 烘烤约 50 分钟"],
+    "notes": ""
+  },
+  {
+    "id": "matcha-cookies",
+    "name": "抹茶饼干",
+    "category": "饼干",
+    "time": "40 分钟",
+    "difficulty": "简单",
+    "image": "",
+    "ingredients": ["120g 面粉", "8g 抹茶粉", "80g 黄油"],
+    "steps": ["混合干性材料", "加入黄油拌匀", "整形后烘烤"],
+    "notes": ""
+  },
+  {
+    "id": "basque-cheesecake",
+    "name": "巴斯克芝士蛋糕",
+    "category": "芝士蛋糕",
+    "time": "60 分钟",
+    "difficulty": "中等",
+    "image": "",
+    "ingredients": ["奶油奶酪", "淡奶油", "鸡蛋", "糖"],
+    "steps": ["混合所有材料", "倒入模具", "高温烘烤至表面焦香"],
+    "notes": ""
+  },
+  {
+    "id": "blueberry-muffins",
+    "name": "蓝莓玛芬",
+    "category": "玛芬",
+    "time": "35 分钟",
+    "difficulty": "简单",
+    "image": "",
+    "ingredients": ["面粉", "蓝莓", "牛奶", "鸡蛋"],
+    "steps": ["混合湿性材料", "加入干性材料", "拌入蓝莓后烘烤"],
+    "notes": ""
+  }
+]
