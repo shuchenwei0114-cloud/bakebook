@@ -1,8 +1,8 @@
 [
   {
     "id": "basque-cheesecake",
-    "name": "巴斯克芝",
-    "category": "芝士蛋糕",
+    "name": "吐司",
+    "category": "面包",
     "ingredients": [
       "奶油奶酪",
       "淡奶油",
@@ -11,16 +11,16 @@
     ],
     "steps": [
       {
-        "text": "混合所有材料",
+        "text": "冷冻模具",
         "minutes": 15
       },
       {
-        "text": "倒入模具并整理",
-        "minutes": 5
+        "text": "把所有材料放进模具搅打，除了黄油和盐之外，不要让面团的温度超过23",
+        "minutes": 10
       },
       {
-        "text": "高温烘烤至表面焦香",
-        "minutes": 40
+        "text": "打出粗膜之后，放黄油和盐继续搅打到出手套膜",
+        "minutes": 10
       }
     ],
     "notes": ""
