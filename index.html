@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7efe7" />
+  <title>BakeBook</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">我的烘焙食谱</p>
+        <h1>BakeBook</h1>
+      </div>
+      <button class="icon-btn" id="manageCategories" aria-label="管理分类">⚙︎</button>
+    </header>
+
+    <section class="search-wrap">
+      <input id="searchInput" type="search" placeholder="搜索食谱名称或食材…" />
+    </section>
+
+    <section class="category-section">
+      <div id="categoryTabs" class="category-tabs" aria-label="食谱分类"></div>
+    </section>
+
+    <section class="content-head">
+      <h2 id="sectionTitle">全部食谱</h2>
+      <span id="recipeCount" class="muted"></span>
+    </section>
+
+    <section id="recipeGrid" class="recipe-grid"></section>
+  </main>
+
+  <nav class="bottom-nav" aria-label="主导航">
+    <button class="nav-item active" data-action="home"><span>⌂</span><small>首页</small></button>
+    <button class="nav-item add" data-action="add"><span>＋</span><small>添加</small></button>
+    <button class="nav-item" data-action="search"><span>⌕</span><small>搜索</small></button>
+    <button class="nav-item" data-action="settings"><span>⚙︎</span><small>设置</small></button>
+  </nav>
+
+  <dialog id="comingSoonDialog">
+    <div class="dialog-card">
+      <h3 id="dialogTitle">即将加入</h3>
+      <p id="dialogText">这个功能会在下一步接入。</p>
+      <button id="closeDialog">知道了</button>
+    </div>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
