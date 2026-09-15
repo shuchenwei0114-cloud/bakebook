@@ -93,8 +93,9 @@
   },
   {
     "id": "honey-crispy-bottom-buns",
-    "name": "蜂蜜小面包",
+    "name": "蜂蜜脆底小面包",
     "category": "面包",
+    "overnightPrep": false,
     "ingredients": [
       "高筋面粉 400g",
       "白糖 40g",
@@ -140,6 +141,6 @@
         "minutes": 0
       }
     ],
-    "notes": ""
+    "notes": "年夜菜King第12弹！屁股脆脆蜂蜜小面包 https://xhslink.cn/o/1LxM3dKM4Uf \n把文本复制好，来【小红书】看看这篇笔记吧！"
   }
 ]
