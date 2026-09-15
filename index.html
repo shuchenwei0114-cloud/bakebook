@@ -8,7 +8,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>BakeBook</title>
-  <link rel="stylesheet" href="style.css?v=10" />
+  <link rel="stylesheet" href="style.css?v=11" />
 </head>
 <body>
   <main class="app-shell">
@@ -47,6 +47,12 @@
       <div class="sheet-head"><button type="button" class="text-btn" id="cancelEditor">取消</button><strong id="editorTitle">新增食谱</strong><span></span></div>
       <label>食谱名称<input id="recipeName" required placeholder="例如：糯米吐司" /></label>
       <label>分类<select id="recipeCategory"></select></label>
+      <label>是否需要过夜准备
+        <select id="recipeOvernight">
+          <option value="false">否</option>
+          <option value="true">是</option>
+        </select>
+      </label>
       <label>总用时<div class="readonly-time"><strong id="totalTime">0</strong> 分钟 <span>（根据下面步骤自动计算）</span></div></label>
       <label>配料<textarea id="recipeIngredients" rows="8" placeholder="每行一种配料，例如：高粉 500g"></textarea></label>
       <div class="steps-head"><strong>制作步骤</strong><button type="button" class="small-add" id="addStepButton">＋ 添加一步</button></div>
@@ -87,6 +93,6 @@
 
   <dialog id="messageDialog"><div class="dialog-card"><h3 id="dialogTitle">提示</h3><p id="dialogText"></p><button id="closeDialog">知道了</button></div></dialog>
 
-  <script src="app.js?v=10" defer></script>
+  <script src="app.js?v=11" defer></script>
 </body>
 </html>
