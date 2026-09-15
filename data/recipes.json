@@ -1,8 +1,9 @@
 [
   {
     "id": "basque-cheesecake",
-    "name": "吐司",
+    "name": "吐司原味",
     "category": "面包",
+    "overnightPrep": false,
     "ingredients": [
       "奶油奶酪",
       "淡奶油",
