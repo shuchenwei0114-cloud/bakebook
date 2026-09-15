@@ -5,10 +5,14 @@
     "category": "面包",
     "overnightPrep": false,
     "ingredients": [
-      "奶油奶酪",
-      "淡奶油",
-      "鸡蛋",
-      "糖"
+      "高筋面粉285g",
+      "淡奶油60g",
+      "冰牛奶110g",
+      "细砂糖30g",
+      "全蛋液40g",
+      "酵母3g",
+      "盐3g",
+      "黄油20g"
     ],
     "steps": [
       {
@@ -22,6 +26,22 @@
       {
         "text": "打出粗膜之后，放黄油和盐继续搅打到出手套膜",
         "minutes": 10
+      },
+      {
+        "text": "发酵1小时",
+        "minutes": 60
+      },
+      {
+        "text": "一发之后拿出来切成三块，揉成圆形之后松弛10分钟",
+        "minutes": 15
+      },
+      {
+        "text": "松弛之后擀成长条放入模具，然后等二发",
+        "minutes": 60
+      },
+      {
+        "text": "八分满之后开始烤\n320度 40分钟到1小时",
+        "minutes": 50
       }
     ],
     "notes": ""
@@ -30,6 +50,7 @@
     "id": "jasmine-cream-cake",
     "name": "茉莉淡奶油蛋糕",
     "category": "蛋糕",
+    "overnightPrep": false,
     "ingredients": [
       "鸡蛋 3个",
       "淡奶油 140克",
