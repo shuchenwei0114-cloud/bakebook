@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#f7efe7" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>BakeBook</title>
-  <link rel="stylesheet" href="style.css?v=5" />
+  <link rel="stylesheet" href="style.css?v=6" />
 </head>
 <body>
   <main class="app-shell">
@@ -46,10 +46,18 @@
 
       <section id="importSection" class="import-box">
         <strong>从配方图片识别</strong>
-        <p>上传视频截图、手写配方、食谱截图等，AI 会把文字整理到下面对应的栏目。</p>
+        <p>选择视频截图、食谱截图或手写配方。文字识别会直接在你的浏览器里运行，图片不会上传到我们的服务器。</p>
         <label class="upload-btn">选择配方图片<input id="recipeImageInput" type="file" accept="image/*" hidden /></label>
         <div id="imageFileName" class="muted"></div>
-        <button type="button" class="secondary-btn" id="recognizeImage">识别并填入</button>
+        <button type="button" class="secondary-btn" id="recognizeImage">开始本地 OCR</button>
+        <div id="ocrProgress" class="ocr-progress hidden"><div id="ocrProgressBar"></div></div>
+        <p id="ocrStatus" class="ocr-status hidden"></p>
+        <div id="ocrResultWrap" class="ocr-result hidden">
+          <label>识别出的原始文字
+            <textarea id="ocrRawText" rows="9" placeholder="OCR 结果会显示在这里，你可以先修改错字。"></textarea>
+          </label>
+          <button type="button" class="secondary-btn" id="organizeOcrText">整理到食谱表单</button>
+        </div>
       </section>
 
       <label>食谱名称<input id="recipeName" required placeholder="例如：糯米吐司" /></label>
@@ -78,6 +86,7 @@
 
   <dialog id="messageDialog"><div class="dialog-card"><h3 id="dialogTitle">提示</h3><p id="dialogText"></p><button id="closeDialog">知道了</button></div></dialog>
 
-  <script src="app.js?v=5" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="app.js?v=6" defer></script>
 </body>
 </html>
