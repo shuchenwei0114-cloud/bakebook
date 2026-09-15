@@ -8,7 +8,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>BakeBook</title>
-  <link rel="stylesheet" href="style.css?v=8" />
+  <link rel="stylesheet" href="style.css?v=9" />
 </head>
 <body>
   <main class="app-shell">
@@ -52,8 +52,8 @@
       <div class="steps-head"><strong>制作步骤</strong><button type="button" class="small-add" id="addStepButton">＋ 添加一步</button></div>
       <div id="stepsEditor" class="steps-editor"></div>
       <label>备注<textarea id="recipeNotes" rows="4" placeholder="例如：下次牛奶减少 10g…"></textarea></label>
-      <p class="save-hint">现在仍是页面预览。下一步接入安全写入接口后，保存会同步到 GitHub。</p>
-      <button class="primary-btn" type="submit">保存</button>
+      <p id="saveStatus" class="save-status"></p>
+      <button class="primary-btn" id="saveRecipeButton" type="submit">保存到 GitHub</button>
       <button class="danger-btn hidden" type="button" id="deleteRecipe">删除这个食谱</button>
     </form>
   </dialog>
@@ -63,12 +63,30 @@
       <div class="sheet-head"><button class="text-btn" id="closeCategories">关闭</button><strong>管理分类</strong><span></span></div>
       <div id="categoryManager"></div>
       <div class="inline-add"><input id="newCategoryName" placeholder="新增分类名称" /><button id="addCategoryButton">＋ 添加</button></div>
-      <p class="save-hint">分类修改目前只做页面预览；云端保存接口接好后会同步更新 categories.json。</p>
+      <p class="save-hint">分类修改会直接同步到 GitHub。</p>
+    </section>
+  </dialog>
+
+  <dialog id="settingsDialog" class="sheet-dialog">
+    <section class="sheet-card form-card">
+      <div class="sheet-head"><button class="text-btn" id="closeSettings">关闭</button><strong>GitHub 连接</strong><span></span></div>
+      <div class="connection-card">
+        <p class="muted">仓库</p>
+        <strong>shuchenwei0114-cloud/bakebook</strong>
+        <p id="connectionStatus" class="connection-status">尚未连接</p>
+      </div>
+      <label>Fine-grained token
+        <input id="githubToken" type="password" autocomplete="off" placeholder="粘贴 GitHub token" />
+      </label>
+      <label class="check-row"><input id="rememberToken" type="checkbox" /> <span>记住这台设备</span></label>
+      <p class="save-hint">Token 只保存在这台设备的浏览器里，不会写进 GitHub 仓库。</p>
+      <button class="primary-btn" type="button" id="testGithubConnection">测试并保存连接</button>
+      <button class="secondary-btn" type="button" id="forgetGithubConnection">清除这台设备上的 token</button>
     </section>
   </dialog>
 
   <dialog id="messageDialog"><div class="dialog-card"><h3 id="dialogTitle">提示</h3><p id="dialogText"></p><button id="closeDialog">知道了</button></div></dialog>
 
-  <script src="app.js?v=8" defer></script>
+  <script src="app.js?v=9" defer></script>
 </body>
 </html>
