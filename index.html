@@ -40,10 +40,71 @@
     <button class="nav-item" data-action="settings"><span>⚙︎</span><small>设置</small></button>
   </nav>
 
-  <dialog id="comingSoonDialog">
+  <dialog id="recipeDialog" class="sheet-dialog">
+    <article class="sheet-card">
+      <div class="sheet-head">
+        <button class="text-btn" id="closeRecipe">关闭</button>
+        <button class="text-btn strong" id="editRecipe">编辑</button>
+      </div>
+      <div class="hero-placeholder" id="detailEmoji">🍰</div>
+      <p class="eyebrow" id="detailCategory"></p>
+      <h2 id="detailName"></h2>
+      <div class="meta-row detail-meta" id="detailMeta"></div>
+      <h3>配料</h3>
+      <ul id="detailIngredients" class="clean-list"></ul>
+      <h3>制作步骤</h3>
+      <ol id="detailSteps" class="clean-list steps-list"></ol>
+      <section id="detailNotesWrap">
+        <h3>备注</h3>
+        <p id="detailNotes" class="notes-box"></p>
+      </section>
+    </article>
+  </dialog>
+
+  <dialog id="editorDialog" class="sheet-dialog">
+    <form id="recipeForm" class="sheet-card form-card">
+      <div class="sheet-head">
+        <button type="button" class="text-btn" id="cancelEditor">取消</button>
+        <strong id="editorTitle">新增食谱</strong>
+        <span class="head-spacer"></span>
+      </div>
+
+      <label>食谱名称<input id="recipeName" required placeholder="例如：香蕉面包" /></label>
+      <label>分类<select id="recipeCategory"></select></label>
+      <div class="form-row">
+        <label>时间<input id="recipeTime" placeholder="60 分钟" /></label>
+        <label>难度<select id="recipeDifficulty"><option>简单</option><option>中等</option><option>困难</option></select></label>
+      </div>
+      <label>配料<textarea id="recipeIngredients" rows="7" placeholder="每行一种配料"></textarea></label>
+      <label>制作步骤<textarea id="recipeSteps" rows="8" placeholder="每行一个步骤"></textarea></label>
+      <label>备注<textarea id="recipeNotes" rows="4" placeholder="记录你下次想调整的地方…"></textarea></label>
+
+      <p class="save-hint">目前这一步先用于体验编辑流程。下一步接入安全写入接口后，保存会直接更新 GitHub 云端数据。</p>
+      <button class="primary-btn" type="submit">保存</button>
+      <button class="danger-btn hidden" type="button" id="deleteRecipe">删除这个食谱</button>
+    </form>
+  </dialog>
+
+  <dialog id="categoryDialog" class="sheet-dialog">
+    <section class="sheet-card form-card">
+      <div class="sheet-head">
+        <button class="text-btn" id="closeCategories">关闭</button>
+        <strong>管理分类</strong>
+        <span class="head-spacer"></span>
+      </div>
+      <div id="categoryManager"></div>
+      <div class="inline-add">
+        <input id="newCategoryName" placeholder="新增分类名称" />
+        <button id="addCategoryButton">＋ 添加</button>
+      </div>
+      <p class="save-hint">分类修改现在只做页面预览；云端保存接口接好后会同步更新 categories.json。</p>
+    </section>
+  </dialog>
+
+  <dialog id="messageDialog">
     <div class="dialog-card">
-      <h3 id="dialogTitle">即将加入</h3>
-      <p id="dialogText">这个功能会在下一步接入。</p>
+      <h3 id="dialogTitle">提示</h3>
+      <p id="dialogText"></p>
       <button id="closeDialog">知道了</button>
     </div>
   </dialog>
