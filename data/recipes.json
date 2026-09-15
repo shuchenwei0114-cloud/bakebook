@@ -50,7 +50,7 @@
     "id": "jasmine-cream-cake",
     "name": "茉莉淡奶油蛋糕",
     "category": "蛋糕",
-    "overnightPrep": false,
+    "overnightPrep": true,
     "ingredients": [
       "鸡蛋 3个",
       "淡奶油 140克",
