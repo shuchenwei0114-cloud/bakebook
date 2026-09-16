@@ -147,6 +147,7 @@
     "id": "chocolate-egg-white-cookies",
     "name": "巧克力饼干蛋清",
     "category": "饼干",
+    "overnightPrep": false,
     "ingredients": [
       "蛋清 2个（常温）",
       "黄油 40克",
@@ -186,6 +187,7 @@
     "id": "snow-skin-mochi-4",
     "name": "雪媚娘（4个）",
     "category": "甜品",
+    "overnightPrep": false,
     "ingredients": [
       "糯米粉 50g",
       "玉米淀粉 15g",
@@ -223,6 +225,6 @@
         "minutes": 0
       }
     ],
-    "notes": "配方约做4个雪媚娘。蒸皮时以中间没有白心为熟透标准。熟糯米粉用于擀皮和包馅时防粘。奶油馅按马斯卡彭20g + 淡奶油40g。冷冻时间未指定，因此不计入总时间。"
+    "notes": "配方约做4个雪媚娘。蒸皮时以中间没有白心为熟透标准。熟糯米粉用于擀皮和包馅时防粘。"
   }
 ]
