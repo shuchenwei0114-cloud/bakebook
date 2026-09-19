@@ -22,7 +22,7 @@
         .catch(function () {});
     })();
   </script>
-  <link rel="stylesheet" href="style.css?v=17" />
+  <link rel="stylesheet" href="style.css?v=18" />
 </head>
 <body>
   <main class="app-shell">
@@ -68,7 +68,9 @@
         </select>
       </label>
       <label>总用时<div class="readonly-time"><strong id="totalTime">0</strong> 分钟 <span>（根据下面步骤自动计算）</span></div></label>
-      <label>配料<textarea id="recipeIngredients" rows="8" placeholder="每行一种配料，例如：高粉 500g"></textarea></label>
+      <div class="ingredients-head"><strong>配料</strong><button type="button" class="small-add" id="addIngredientButton">＋ 添加食材</button></div>
+      <div class="ingredient-columns" aria-hidden="true"><span>食材</span><span>数量</span><span>单位</span><span></span></div>
+      <div id="ingredientsEditor" class="ingredients-editor"></div>
       <div class="steps-head"><strong>制作步骤</strong><button type="button" class="small-add" id="addStepButton">＋ 添加一步</button></div>
       <div id="stepsEditor" class="steps-editor"></div>
       <label>备注<textarea id="recipeNotes" rows="4" placeholder="例如：下次牛奶减少 10g…"></textarea></label>
@@ -102,12 +104,12 @@
       <p class="save-hint">Token 只保存在这台设备的浏览器里，不会写进网页代码或食谱数据。</p>
       <button class="primary-btn" type="button" id="testGithubConnection">测试并保存连接</button>
       <button class="secondary-btn" type="button" id="forgetGithubConnection">清除这台设备上的 token</button>
-      <p class="muted" style="margin-top:24px; line-height:1.6;">BakeBook v17<br>上次更新：2026-09-19 19:12</p>
+      <p class="muted" style="margin-top:24px; line-height:1.6;">BakeBook v18<br>上次更新：2026-09-19 19:30</p>
     </section>
   </dialog>
 
   <dialog id="messageDialog"><div class="dialog-card"><h3 id="dialogTitle">提示</h3><p id="dialogText"></p><button id="closeDialog">知道了</button></div></dialog>
 
-  <script src="app.js?v=17" defer></script>
+  <script src="app.js?v=18" defer></script>
 </body>
 </html>

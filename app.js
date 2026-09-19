@@ -123,6 +123,69 @@ async function clearStoredToken() {
   await idbDelete(TOKEN_KEY);
 }
 
+function fractionToNumber(raw) {
+  if (typeof raw !== "string") return Number(raw);
+  const text = raw.trim();
+  if (/^\d+\s+\d+\/\d+$/.test(text)) {
+    const [whole, frac] = text.split(/\s+/);
+    const [a, b] = frac.split("/").map(Number);
+    return Number(whole) + a / b;
+  }
+  if (/^\d+\/\d+$/.test(text)) {
+    const [a, b] = text.split("/").map(Number);
+    return a / b;
+  }
+  return Number(text);
+}
+
+function normalizeIngredient(ingredient) {
+  if (ingredient && typeof ingredient === "object" && !Array.isArray(ingredient)) {
+    const rawAmount = ingredient.amount;
+    const amount = rawAmount === "" || rawAmount === null || rawAmount === undefined
+      ? null
+      : Number(rawAmount);
+    return {
+      name: String(ingredient.name || "").trim(),
+      amount: Number.isFinite(amount) ? amount : null,
+      unit: String(ingredient.unit || "").trim()
+    };
+  }
+
+  const text = String(ingredient || "").trim();
+  if (!text) return { name: "", amount: null, unit: "" };
+
+  const quantityWord = text.match(/^(.*?)(适量|少许|若干|几滴|数滴)([（(].*[）)])?$/);
+  if (quantityWord) {
+    const note = quantityWord[3] ? quantityWord[3] : "";
+    return {
+      name: (quantityWord[1].trim() + (note ? " " + note : "")).trim(),
+      amount: null,
+      unit: quantityWord[2]
+    };
+  }
+
+  const numberPattern = "(\\d+\\s+\\d+\\/\\d+|\\d+\\/\\d+|\\d+(?:\\.\\d+)?)";
+  const unitPattern = "(kg|mg|ml|lb|lbs|oz|g|l|cups?|tbsp|tsp|克|千克|公斤|毫克|毫升|升|个|颗|枚|只|根|片|块|勺|茶匙|汤匙|杯)";
+  const match = text.match(new RegExp("^(.*?)" + numberPattern + "\\s*" + unitPattern + "(.*)$", "i"));
+  if (match) {
+    const amount = fractionToNumber(match[2]);
+    const suffix = match[4].trim();
+    return {
+      name: (match[1].trim() + (suffix ? " " + suffix : "")).trim(),
+      amount: Number.isFinite(amount) ? amount : null,
+      unit: match[3]
+    };
+  }
+
+  return { name: text, amount: null, unit: "" };
+}
+
+function ingredientText(ingredient) {
+  const item = normalizeIngredient(ingredient);
+  const amount = item.amount === null ? "" : String(item.amount);
+  return [item.name, amount, item.unit].filter(Boolean).join(" ");
+}
+
 function normalizeRecipe(recipe) {
   let steps = recipe.steps || [];
   if (steps.length && typeof steps[0] === "string") steps = steps.map(text => ({ text, minutes: 0 }));
@@ -131,7 +194,7 @@ function normalizeRecipe(recipe) {
     name: recipe.name || "未命名食谱",
     category: recipe.category || "其他",
     overnightPrep: Boolean(recipe.overnightPrep),
-    ingredients: recipe.ingredients || [],
+    ingredients: (recipe.ingredients || []).map(normalizeIngredient),
     steps,
     notes: recipe.notes || ""
   };
@@ -236,7 +299,7 @@ function renderRecipes() {
   const query = searchInput.value.trim().toLowerCase();
   const filtered = allRecipes.filter(recipe => {
     const categoryMatch = activeCategory === "全部" || recipe.category === activeCategory;
-    const text = [recipe.name, recipe.category, ...(recipe.ingredients || [])].join(" ").toLowerCase();
+    const text = [recipe.name, recipe.category, ...(recipe.ingredients || []).map(ingredientText)].join(" ").toLowerCase();
     return categoryMatch && text.includes(query);
   });
   sectionTitle.textContent = activeCategory === "全部" ? "全部食谱" : activeCategory;
@@ -259,7 +322,7 @@ function openRecipe(id) {
   byId("detailCategory").textContent = selectedRecipe.category;
   byId("detailName").textContent = selectedRecipe.name;
   byId("detailMeta").innerHTML = `<span class="pill">总用时 ${totalMinutes(selectedRecipe)} 分钟</span>${selectedRecipe.overnightPrep ? '<span class="pill">需过夜准备</span>' : ""}`;
-  byId("detailIngredients").innerHTML = (selectedRecipe.ingredients || []).map(x => `<li>${escapeHtml(x)}</li>`).join("") || "<li>暂无配料</li>";
+  byId("detailIngredients").innerHTML = (selectedRecipe.ingredients || []).map(x => `<li>${escapeHtml(ingredientText(x))}</li>`).join("") || "<li>暂无配料</li>";
   byId("detailSteps").innerHTML = (selectedRecipe.steps || []).map((step, index) => `<div class="detail-step"><span class="step-number">${index + 1}</span><div><p>${escapeHtml(step.text || "")}</p><small>${Number(step.minutes) || 0} 分钟</small></div></div>`).join("") || "<p class='muted'>暂无步骤</p>";
   byId("detailNotes").textContent = selectedRecipe.notes || "暂无备注";
   recipeDialog.showModal();
@@ -271,12 +334,47 @@ function openEditor(recipe = null) {
   populateCategorySelect(recipe?.category);
   byId("recipeName").value = recipe?.name || "";
   byId("recipeOvernight").value = recipe?.overnightPrep ? "true" : "false";
-  byId("recipeIngredients").value = (recipe?.ingredients || []).join("\n");
+  renderIngredientsEditor(recipe?.ingredients?.length ? recipe.ingredients : [{ name: "", amount: null, unit: "" }]);
   byId("recipeNotes").value = recipe?.notes || "";
   byId("deleteRecipe").classList.toggle("hidden", !recipe);
   byId("saveStatus").textContent = "";
   renderStepsEditor(recipe?.steps?.length ? recipe.steps : [{ text: "", minutes: 0 }]);
   editorDialog.showModal();
+}
+
+function renderIngredientsEditor(ingredients) {
+  const container = byId("ingredientsEditor");
+  if (!container) return;
+  container.innerHTML = "";
+  ingredients.map(normalizeIngredient).forEach(item => addIngredientRow(item));
+}
+
+function addIngredientRow(item = { name: "", amount: null, unit: "" }) {
+  const ingredient = normalizeIngredient(item);
+  const row = document.createElement("div");
+  row.className = "ingredient-row";
+  row.innerHTML = `
+    <input class="ingredient-name" type="text" placeholder="例如：高筋面粉" value="${escapeAttr(ingredient.name)}" />
+    <input class="ingredient-amount" type="number" step="any" inputmode="decimal" placeholder="500" value="${ingredient.amount === null ? "" : escapeAttr(ingredient.amount)}" />
+    <input class="ingredient-unit" type="text" placeholder="g" value="${escapeAttr(ingredient.unit)}" />
+    <button type="button" class="remove-ingredient" aria-label="删除这个食材">×</button>`;
+  row.querySelector(".remove-ingredient").onclick = () => {
+    row.remove();
+    if (!byId("ingredientsEditor").children.length) addIngredientRow();
+  };
+  byId("ingredientsEditor").appendChild(row);
+}
+
+function collectIngredients() {
+  return [...document.querySelectorAll(".ingredient-row")]
+    .map(row => {
+      const name = row.querySelector(".ingredient-name").value.trim();
+      const amountRaw = row.querySelector(".ingredient-amount").value.trim();
+      const unit = row.querySelector(".ingredient-unit").value.trim();
+      const amount = amountRaw === "" ? null : Number(amountRaw);
+      return { name, amount: Number.isFinite(amount) ? amount : null, unit };
+    })
+    .filter(item => item.name || item.amount !== null || item.unit);
 }
 
 function renderStepsEditor(steps) {
@@ -324,7 +422,7 @@ function formToRecipe() {
     name: byId("recipeName").value.trim(),
     category: byId("recipeCategory").value,
     overnightPrep: byId("recipeOvernight").value === "true",
-    ingredients: lines(byId("recipeIngredients").value),
+    ingredients: collectIngredients(),
     steps: collectSteps(),
     notes: byId("recipeNotes").value.trim()
   };
@@ -346,7 +444,7 @@ function friendlyError(error) {
 async function saveRecipe(recipe) {
   const token = getStoredToken();
   const latest = await githubReadJson("data/recipes.json", token, true);
-  const list = latest.json.map(normalizeRecipe);
+  const list = Array.isArray(latest.json) ? [...latest.json] : [];
   const idx = list.findIndex(r => r.id === recipe.id);
   if (idx >= 0) list[idx] = recipe; else list.unshift(recipe);
   await githubWriteJson("data/recipes.json", list, latest.sha, `${idx >= 0 ? "Update" : "Add"} recipe: ${recipe.name}`, token);
@@ -356,7 +454,7 @@ async function saveRecipe(recipe) {
 async function deleteRecipe(id, name) {
   const token = getStoredToken();
   const latest = await githubReadJson("data/recipes.json", token, true);
-  const list = latest.json.map(normalizeRecipe).filter(r => r.id !== id);
+  const list = (Array.isArray(latest.json) ? latest.json : []).filter(r => r.id !== id);
   await githubWriteJson("data/recipes.json", list, latest.sha, `Delete recipe: ${name}`, token);
   return list;
 }
@@ -386,7 +484,7 @@ function renderCategoryManager() {
       const nextRecipes = allRecipes.map(r => r.category === old ? { ...r, category: next } : r);
       try {
         const recipeFile = await githubReadJson("data/recipes.json", getStoredToken(), true);
-        const latestRecipes = recipeFile.json.map(normalizeRecipe).map(r => r.category === old ? { ...r, category: next } : r);
+        const latestRecipes = (Array.isArray(recipeFile.json) ? recipeFile.json : []).map(r => r.category === old ? { ...r, category: next } : r);
         await githubWriteJson("data/recipes.json", latestRecipes, recipeFile.sha, `Rename category in recipes: ${old} to ${next}`);
         await saveCategories(nextCategories, `Rename category: ${old} to ${next}`);
         categories = nextCategories;
@@ -447,6 +545,7 @@ byId("editRecipe")?.addEventListener("click", () => { recipeDialog.close(); open
 byId("cancelEditor")?.addEventListener("click", () => editorDialog.close());
 byId("closeDialog")?.addEventListener("click", () => messageDialog.close());
 byId("closeSettings")?.addEventListener("click", () => settingsDialog.close());
+byId("addIngredientButton")?.addEventListener("click", () => addIngredientRow());
 byId("addStepButton")?.addEventListener("click", () => { addStepRow(); updateStepNumbersAndTotal(); });
 
 byId("addCategoryButton")?.addEventListener("click", async () => {
