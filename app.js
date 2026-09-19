@@ -278,11 +278,11 @@ function parseQuantityText(text) {
 
   const raw = match[1];
   let amount = 0;
-  if (/^\\d+\\s+\\d+\\/\\d+$/.test(raw)) {
-    const parts = raw.split(/\\s+/);
+  if (new RegExp("^\\\\d+\\\\s+\\\\d+/\\\\d+$").test(raw)) {
+    const parts = raw.split(/\s+/);
     const fraction = parts[1].split("/");
     amount = Number(parts[0]) + Number(fraction[0]) / Number(fraction[1]);
-  } else if (/^\\d+\\/\\d+$/.test(raw)) {
+  } else if (new RegExp("^\\\\d+/\\\\d+$").test(raw)) {
     const fraction = raw.split("/");
     amount = Number(fraction[0]) / Number(fraction[1]);
   } else {
