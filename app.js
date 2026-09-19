@@ -4,6 +4,7 @@ let activeCategory = "全部";
 let selectedRecipe = null;
 let editingId = null;
 let persistentToken = "";
+let currentScaleFactor = 1;
 
 const REPO = "shuchenwei0114-cloud/bakebook";
 const API_BASE = `https://api.github.com/repos/${REPO}/contents`;
@@ -322,10 +323,106 @@ function openRecipe(id) {
   byId("detailCategory").textContent = selectedRecipe.category;
   byId("detailName").textContent = selectedRecipe.name;
   byId("detailMeta").innerHTML = `<span class="pill">总用时 ${totalMinutes(selectedRecipe)} 分钟</span>${selectedRecipe.overnightPrep ? '<span class="pill">需过夜准备</span>' : ""}`;
-  byId("detailIngredients").innerHTML = (selectedRecipe.ingredients || []).map(x => `<li>${escapeHtml(ingredientText(x))}</li>`).join("") || "<li>暂无配料</li>";
+  currentScaleFactor = 1;
+  renderDetailIngredients();
+  setupScaleControls();
   byId("detailSteps").innerHTML = (selectedRecipe.steps || []).map((step, index) => `<div class="detail-step"><span class="step-number">${index + 1}</span><div><p>${escapeHtml(step.text || "")}</p><small>${Number(step.minutes) || 0} 分钟</small></div></div>`).join("") || "<p class='muted'>暂无步骤</p>";
   byId("detailNotes").textContent = selectedRecipe.notes || "暂无备注";
   recipeDialog.showModal();
+}
+
+function formatAmount(value) {
+  if (!Number.isFinite(value)) return "";
+  if (Math.abs(value - Math.round(value)) < 0.0001) return String(Math.round(value));
+  return String(Number(value.toFixed(2)));
+}
+
+function scaledIngredientText(ingredient) {
+  const item = normalizeIngredient(ingredient);
+  const amount = item.amount === null ? null : item.amount * currentScaleFactor;
+  return [
+    item.name,
+    amount === null ? "" : formatAmount(amount),
+    item.unit
+  ].filter(Boolean).join(" ");
+}
+
+function renderDetailIngredients() {
+  if (!selectedRecipe) return;
+  byId("detailIngredients").innerHTML = (selectedRecipe.ingredients || [])
+    .map(item => `<li>${escapeHtml(scaledIngredientText(item))}</li>`)
+    .join("") || "<li>暂无配料</li>";
+}
+
+function scaleableIngredients() {
+  if (!selectedRecipe) return [];
+  return (selectedRecipe.ingredients || [])
+    .map((ingredient, index) => ({ index, ingredient: normalizeIngredient(ingredient) }))
+    .filter(item => item.ingredient.amount !== null && item.ingredient.amount > 0);
+}
+
+function syncScaleReference() {
+  const options = scaleableIngredients();
+  const selectedIndex = Number(byId("scaleIngredient").value);
+  const ref = options.find(item => item.index === selectedIndex) || options[0];
+  if (!ref) return;
+  byId("scaleAmount").value = formatAmount(ref.ingredient.amount);
+  byId("scaleUnit").textContent = ref.ingredient.unit || "";
+  currentScaleFactor = 1;
+  renderDetailIngredients();
+  byId("scaleSummary").textContent = "";
+  byId("resetScale").classList.add("hidden");
+}
+
+function setupScaleControls() {
+  const toggle = byId("toggleScale");
+  const panel = byId("scalePanel");
+  const select = byId("scaleIngredient");
+  const options = scaleableIngredients();
+
+  panel.classList.add("hidden");
+  byId("scaleSummary").textContent = "";
+  byId("resetScale").classList.add("hidden");
+
+  if (!options.length) {
+    toggle.classList.add("hidden");
+    return;
+  }
+
+  toggle.classList.remove("hidden");
+  select.innerHTML = options.map(item => {
+    const x = item.ingredient;
+    const label = [x.name, "—", formatAmount(x.amount), x.unit].filter(Boolean).join(" ");
+    return `<option value="${item.index}">${escapeHtml(label)}</option>`;
+  }).join("");
+  syncScaleReference();
+}
+
+function toggleScalePanel() {
+  const panel = byId("scalePanel");
+  panel.classList.toggle("hidden");
+}
+
+function applyIngredientScale() {
+  const options = scaleableIngredients();
+  const selectedIndex = Number(byId("scaleIngredient").value);
+  const ref = options.find(item => item.index === selectedIndex);
+  const desired = Number(byId("scaleAmount").value);
+  if (!ref || !Number.isFinite(desired) || desired <= 0) {
+    byId("scaleSummary").textContent = "请输入大于 0 的数量。";
+    return;
+  }
+
+  currentScaleFactor = desired / ref.ingredient.amount;
+  renderDetailIngredients();
+  byId("scaleSummary").textContent = `已按 ${formatAmount(currentScaleFactor)}× 显示；原食谱不会改变。`;
+  byId("resetScale").classList.remove("hidden");
+}
+
+function resetIngredientScale() {
+  currentScaleFactor = 1;
+  renderDetailIngredients();
+  syncScaleReference();
 }
 
 function openEditor(recipe = null) {
@@ -541,6 +638,10 @@ searchInput?.addEventListener("input", renderRecipes);
 byId("manageCategories")?.addEventListener("click", openCategoryManager);
 byId("closeCategories")?.addEventListener("click", () => categoryDialog.close());
 byId("closeRecipe")?.addEventListener("click", () => recipeDialog.close());
+byId("toggleScale")?.addEventListener("click", toggleScalePanel);
+byId("scaleIngredient")?.addEventListener("change", syncScaleReference);
+byId("applyScale")?.addEventListener("click", applyIngredientScale);
+byId("resetScale")?.addEventListener("click", resetIngredientScale);
 byId("editRecipe")?.addEventListener("click", () => { recipeDialog.close(); openEditor(selectedRecipe); });
 byId("cancelEditor")?.addEventListener("click", () => editorDialog.close());
 byId("closeDialog")?.addEventListener("click", () => messageDialog.close());
