@@ -8,7 +8,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>BakeBook</title>
-  <link rel="stylesheet" href="style.css?v=13" />
+  <link rel="stylesheet" href="style.css?v=14" />
 </head>
 <body>
   <main class="app-shell">
@@ -37,6 +37,23 @@
       <h2 id="detailName"></h2>
       <div class="meta-row detail-meta" id="detailMeta"></div>
       <h3>配料</h3><ul id="detailIngredients" class="clean-list"></ul>
+      <section id="scaleBox" class="scale-box hidden">
+        <div class="scale-head">
+          <div><h3>调整配方</h3><p>按你手头现有的某一种食材，自动换算整份配方。</p></div>
+        </div>
+        <label>以这个食材为准
+          <select id="scaleIngredient"></select>
+        </label>
+        <label>我现在有
+          <div class="scale-amount-row">
+            <input id="scaleAmount" type="number" min="0" step="any" inputmode="decimal" />
+            <span id="scaleUnit"></span>
+          </div>
+        </label>
+        <button type="button" class="secondary-btn" id="applyScale">换算配方</button>
+        <button type="button" class="text-btn scale-reset hidden" id="resetScale">恢复原配方</button>
+        <p id="scaleSummary" class="muted scale-summary"></p>
+      </section>
       <h3>制作步骤</h3><div id="detailSteps" class="detail-steps"></div>
       <section><h3>备注</h3><p id="detailNotes" class="notes-box"></p></section>
     </article>
@@ -88,12 +105,12 @@
       <p class="save-hint">Token 只保存在这台设备的浏览器里，不会写进网页代码或食谱数据。</p>
       <button class="primary-btn" type="button" id="testGithubConnection">测试并保存连接</button>
       <button class="secondary-btn" type="button" id="forgetGithubConnection">清除这台设备上的 token</button>
-      <p class="muted" style="margin-top:24px; line-height:1.6;">BakeBook v13<br>上次更新：2026-09-14 22:34</p>
+      <p class="muted" style="margin-top:24px; line-height:1.6;">BakeBook v14<br>上次更新：2026-09-19 18:47</p>
     </section>
   </dialog>
 
   <dialog id="messageDialog"><div class="dialog-card"><h3 id="dialogTitle">提示</h3><p id="dialogText"></p><button id="closeDialog">知道了</button></div></dialog>
 
-  <script src="app.js?v=13" defer></script>
+  <script src="app.js?v=14" defer></script>
 </body>
 </html>
