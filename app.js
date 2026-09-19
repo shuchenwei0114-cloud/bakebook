@@ -4,6 +4,7 @@ let activeCategory = "全部";
 let selectedRecipe = null;
 let editingId = null;
 let persistentToken = "";
+let currentScaleFactor = 1;
 
 const REPO = "shuchenwei0114-cloud/bakebook";
 const API_BASE = `https://api.github.com/repos/${REPO}/contents`;
@@ -259,10 +260,125 @@ function openRecipe(id) {
   byId("detailCategory").textContent = selectedRecipe.category;
   byId("detailName").textContent = selectedRecipe.name;
   byId("detailMeta").innerHTML = `<span class="pill">总用时 ${totalMinutes(selectedRecipe)} 分钟</span>${selectedRecipe.overnightPrep ? '<span class="pill">需过夜准备</span>' : ""}`;
-  byId("detailIngredients").innerHTML = (selectedRecipe.ingredients || []).map(x => `<li>${escapeHtml(x)}</li>`).join("") || "<li>暂无配料</li>";
+  currentScaleFactor = 1;
+  renderScaledIngredients();
+  setupScaleControls();
   byId("detailSteps").innerHTML = (selectedRecipe.steps || []).map((step, index) => `<div class="detail-step"><span class="step-number">${index + 1}</span><div><p>${escapeHtml(step.text || "")}</p><small>${Number(step.minutes) || 0} 分钟</small></div></div>`).join("") || "<p class='muted'>暂无步骤</p>";
   byId("detailNotes").textContent = selectedRecipe.notes || "暂无备注";
   recipeDialog.showModal();
+}
+
+
+function parseQuantityText(text) {
+  const unitPattern = "(?:kg|g|mg|ml|l|oz|lb|lbs|cup|cups|tsp|tbsp|克|千克|公斤|毫克|毫升|升|个|颗|枚|只|根|片|块|勺|茶匙|汤匙|杯)";
+  const numberPattern = "(?:\\d+\\s+\\d+\\/\\d+|\\d+\\/\\d+|\\d+(?:\\.\\d+)?)";
+  let match = text.match(new RegExp("(" + numberPattern + ")\\s*(" + unitPattern + ")", "i"));
+  if (!match) match = text.match(new RegExp("(" + numberPattern + ")", "i"));
+  if (!match) return null;
+
+  const raw = match[1];
+  let amount = 0;
+  if (/^\\d+\\s+\\d+\\/\\d+$/.test(raw)) {
+    const parts = raw.split(/\\s+/);
+    const fraction = parts[1].split("/");
+    amount = Number(parts[0]) + Number(fraction[0]) / Number(fraction[1]);
+  } else if (/^\\d+\\/\\d+$/.test(raw)) {
+    const fraction = raw.split("/");
+    amount = Number(fraction[0]) / Number(fraction[1]);
+  } else {
+    amount = Number(raw);
+  }
+  if (!Number.isFinite(amount) || amount <= 0) return null;
+
+  const amountOffset = match[0].indexOf(raw);
+  const start = (match.index || 0) + amountOffset;
+  return {
+    amount,
+    unit: match[2] || "",
+    start,
+    end: start + raw.length
+  };
+}
+
+function formatScaledAmount(value) {
+  if (Math.abs(value - Math.round(value)) < 0.001) return String(Math.round(value));
+  if (value < 10) return String(Math.round(value * 100) / 100);
+  return String(Math.round(value * 10) / 10);
+}
+
+function scaleIngredientText(text, factor) {
+  const parsed = parseQuantityText(text);
+  if (!parsed || factor === 1) return text;
+  const scaled = formatScaledAmount(parsed.amount * factor);
+  return text.slice(0, parsed.start) + scaled + text.slice(parsed.end);
+}
+
+function renderScaledIngredients() {
+  if (!selectedRecipe) return;
+  const ingredients = selectedRecipe.ingredients || [];
+  byId("detailIngredients").innerHTML = ingredients
+    .map(x => `<li>${escapeHtml(scaleIngredientText(x, currentScaleFactor))}</li>`)
+    .join("") || "<li>暂无配料</li>";
+}
+
+function setupScaleControls() {
+  const box = byId("scaleBox");
+  const select = byId("scaleIngredient");
+  const amountInput = byId("scaleAmount");
+  const unit = byId("scaleUnit");
+  const summary = byId("scaleSummary");
+  const reset = byId("resetScale");
+  if (!box || !select || !selectedRecipe) return;
+
+  const options = (selectedRecipe.ingredients || [])
+    .map((text, index) => ({ text, index, parsed: parseQuantityText(text) }))
+    .filter(item => item.parsed);
+
+  if (!options.length) {
+    box.classList.add("hidden");
+    return;
+  }
+
+  box.classList.remove("hidden");
+  select.innerHTML = options
+    .map(item => `<option value="${item.index}">${escapeHtml(item.text)}</option>`)
+    .join("");
+
+  function syncReferenceAmount() {
+    const ingredient = selectedRecipe.ingredients[Number(select.value)];
+    const parsed = parseQuantityText(ingredient || "");
+    if (!parsed) return;
+    amountInput.value = formatScaledAmount(parsed.amount);
+    unit.textContent = parsed.unit || "";
+  }
+
+  select.onchange = syncReferenceAmount;
+  currentScaleFactor = 1;
+  summary.textContent = "";
+  reset.classList.add("hidden");
+  syncReferenceAmount();
+}
+
+function applyIngredientScale() {
+  if (!selectedRecipe) return;
+  const index = Number(byId("scaleIngredient").value);
+  const ingredient = selectedRecipe.ingredients[index];
+  const parsed = parseQuantityText(ingredient || "");
+  const desired = Number(byId("scaleAmount").value);
+  if (!parsed || !Number.isFinite(desired) || desired <= 0) {
+    byId("scaleSummary").textContent = "请输入有效的数量。";
+    return;
+  }
+  currentScaleFactor = desired / parsed.amount;
+  renderScaledIngredients();
+  byId("scaleSummary").textContent = `已按 ${Math.round(currentScaleFactor * 100) / 100} 倍显示，原配方不会改变。`;
+  byId("resetScale").classList.remove("hidden");
+}
+
+function resetIngredientScale() {
+  currentScaleFactor = 1;
+  renderScaledIngredients();
+  setupScaleControls();
 }
 
 function openEditor(recipe = null) {
@@ -443,6 +559,8 @@ searchInput?.addEventListener("input", renderRecipes);
 byId("manageCategories")?.addEventListener("click", openCategoryManager);
 byId("closeCategories")?.addEventListener("click", () => categoryDialog.close());
 byId("closeRecipe")?.addEventListener("click", () => recipeDialog.close());
+byId("applyScale")?.addEventListener("click", applyIngredientScale);
+byId("resetScale")?.addEventListener("click", resetIngredientScale);
 byId("editRecipe")?.addEventListener("click", () => { recipeDialog.close(); openEditor(selectedRecipe); });
 byId("cancelEditor")?.addEventListener("click", () => editorDialog.close());
 byId("closeDialog")?.addEventListener("click", () => messageDialog.close());
