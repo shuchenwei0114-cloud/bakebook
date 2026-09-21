@@ -22,13 +22,12 @@
         .catch(function () {});
     })();
   </script>
-  <link rel="stylesheet" href="style.css?v=19" />
+  <link rel="stylesheet" href="style.css?v=20" />
 </head>
 <body>
   <main class="app-shell">
     <header class="topbar">
       <div><p class="eyebrow">我的烘焙食谱</p><h1>BakeBook</h1></div>
-      <button class="icon-btn" id="manageCategories" aria-label="管理分类">⚙︎</button>
     </header>
 
     <section class="search-wrap"><input id="searchInput" type="search" placeholder="搜索食谱名称或食材…" /></section>
@@ -40,7 +39,6 @@
   <nav class="bottom-nav" aria-label="主导航">
     <button class="nav-item active" data-action="home"><span>⌂</span><small>首页</small></button>
     <button class="nav-item add" data-action="add"><span>＋</span><small>添加</small></button>
-    <button class="nav-item" data-action="search"><span>⌕</span><small>搜索</small></button>
     <button class="nav-item" data-action="settings"><span>⚙︎</span><small>设置</small></button>
   </nav>
 
@@ -120,12 +118,12 @@
       <p class="save-hint">Token 只保存在这台设备的浏览器里，不会写进网页代码或食谱数据。</p>
       <button class="primary-btn" type="button" id="testGithubConnection">测试并保存连接</button>
       <button class="secondary-btn" type="button" id="forgetGithubConnection">清除这台设备上的 token</button>
-      <p class="muted" style="margin-top:24px; line-height:1.6;">BakeBook v19<br>上次更新：2026-09-19 19:19</p>
+      <p class="muted" style="margin-top:24px; line-height:1.6;">BakeBook v20<br>上次更新：2026-09-20 22:49</p>
     </section>
   </dialog>
 
   <dialog id="messageDialog"><div class="dialog-card"><h3 id="dialogTitle">提示</h3><p id="dialogText"></p><button id="closeDialog">知道了</button></div></dialog>
 
-  <script src="app.js?v=19" defer></script>
+  <script src="app.js?v=20" defer></script>
 </body>
 </html>

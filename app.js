@@ -635,7 +635,6 @@ function refreshConnectionStatus(ok = null) {
 }
 
 searchInput?.addEventListener("input", renderRecipes);
-byId("manageCategories")?.addEventListener("click", openCategoryManager);
 byId("closeCategories")?.addEventListener("click", () => categoryDialog.close());
 byId("closeRecipe")?.addEventListener("click", () => recipeDialog.close());
 byId("toggleScale")?.addEventListener("click", toggleScalePanel);
@@ -733,7 +732,6 @@ document.querySelectorAll(".nav-item").forEach(button => {
   button.addEventListener("click", () => {
     const action = button.dataset.action;
     if (action === "home") return window.scrollTo({ top: 0, behavior: "smooth" });
-    if (action === "search") return searchInput.focus();
     if (action === "add") return openEditor();
     if (action === "settings") return openSettings();
   });
