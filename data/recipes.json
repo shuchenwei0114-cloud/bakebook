@@ -189,15 +189,51 @@
     "category": "甜品",
     "overnightPrep": false,
     "ingredients": [
-      "糯米粉 50g",
-      "玉米淀粉 15g",
-      "细砂糖 25g",
-      "牛奶 85g",
-      "黄油 10g",
-      "马斯卡彭 20g",
-      "淡奶油 40g",
-      "喜欢的馅料/调味料 适量",
-      "糯米粉 适量（炒熟后防粘用）"
+      {
+        "name": "糯米粉",
+        "amount": 50,
+        "unit": "g"
+      },
+      {
+        "name": "玉米淀粉",
+        "amount": 15,
+        "unit": "g"
+      },
+      {
+        "name": "细砂糖",
+        "amount": 25,
+        "unit": "g"
+      },
+      {
+        "name": "牛奶",
+        "amount": 85,
+        "unit": "g"
+      },
+      {
+        "name": "黄油",
+        "amount": 10,
+        "unit": "g"
+      },
+      {
+        "name": "马斯卡彭",
+        "amount": 30,
+        "unit": "g"
+      },
+      {
+        "name": "淡奶油",
+        "amount": 60,
+        "unit": "g"
+      },
+      {
+        "name": "喜欢的馅料/调味料",
+        "amount": null,
+        "unit": "适量"
+      },
+      {
+        "name": "糯米粉 （炒熟后防粘用）",
+        "amount": null,
+        "unit": "适量"
+      }
     ],
     "steps": [
       {
