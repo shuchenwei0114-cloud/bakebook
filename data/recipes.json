@@ -413,36 +413,12 @@
     "category": "蛋糕",
     "overnightPrep": false,
     "ingredients": [
-      {
-        "name": "鸡蛋",
-        "amount": 5,
-        "unit": "个"
-      },
-      {
-        "name": "低筋面粉",
-        "amount": 91,
-        "unit": "g"
-      },
-      {
-        "name": "玉米油",
-        "amount": 42,
-        "unit": "g"
-      },
-      {
-        "name": "Twin Swans Pandan Leaves Extract",
-        "amount": 81,
-        "unit": "g"
-      },
-      {
-        "name": "椰浆",
-        "amount": 25,
-        "unit": "g"
-      },
-      {
-        "name": "糖",
-        "amount": 40,
-        "unit": "g"
-      }
+      "鸡蛋 5个",
+      "低筋面粉 70g",
+      "玉米油 50g",
+      "椰浆 20–25g",
+      "Twin Swans Pandan Leaves Extract 约60g",
+      "糖 40g"
     ],
     "steps": [
       {
@@ -466,6 +442,6 @@
         "minutes": 50
       }
     ],
-    "notes": "未加牛奶。斑斓液使用 Twin Swans Pandan Leaves Extract。"
+    "notes": "未加牛奶。斑斓液使用 Twin Swans Pandan Leaves Extract。当前保留版本为较喜欢的70g低筋面粉、50g玉米油、约60g斑斓液配方。"
   }
 ]
