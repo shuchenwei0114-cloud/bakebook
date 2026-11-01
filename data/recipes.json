@@ -409,20 +409,45 @@
   },
   {
     "id": "pandan-cake-roll-v2",
-    "name": "斑斓蛋糕卷（实做第二版）",
+    "name": "斑斓蛋糕卷",
     "category": "蛋糕",
+    "overnightPrep": false,
     "ingredients": [
-      "鸡蛋 5个",
-      "低筋面粉 91g",
-      "玉米油 42g",
-      "Twin Swans Pandan Leaves Extract 81g",
-      "椰浆 25g",
-      "糖 40g"
+      {
+        "name": "鸡蛋",
+        "amount": 5,
+        "unit": "个"
+      },
+      {
+        "name": "低筋面粉",
+        "amount": 91,
+        "unit": "g"
+      },
+      {
+        "name": "玉米油",
+        "amount": 42,
+        "unit": "g"
+      },
+      {
+        "name": "Twin Swans Pandan Leaves Extract",
+        "amount": 81,
+        "unit": "g"
+      },
+      {
+        "name": "椰浆",
+        "amount": 25,
+        "unit": "g"
+      },
+      {
+        "name": "糖",
+        "amount": 40,
+        "unit": "g"
+      }
     ],
     "steps": [
       {
         "text": "将蛋黄和蛋清分离，蛋清放入冷冻。",
-        "minutes": 0
+        "minutes": 5
       },
       {
         "text": "蛋黄加入玉米油、Twin Swans Pandan Leaves Extract和椰浆，搅拌均匀后筛入低筋面粉，混合均匀。",
@@ -441,6 +466,6 @@
         "minutes": 50
       }
     ],
-    "notes": "实做第二版。未加牛奶。斑斓液使用 Twin Swans Pandan Leaves Extract。"
+    "notes": "未加牛奶。斑斓液使用 Twin Swans Pandan Leaves Extract。"
   }
 ]
