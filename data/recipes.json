@@ -421,5 +421,41 @@
     ],
     "steps": [],
     "notes": "实做第二版。未加牛奶。斑斓液使用 Twin Swans Pandan Leaves Extract。本次在第一版基础上调整：低筋面粉增加至91g，玉米油减少至42g，斑斓液增加至81g，椰浆25g。烘烤温度、时间及成品表现尚未记录，后续可补充。"
+  },
+  {
+    "id": "pandan-cake-roll-v1",
+    "name": "斑斓蛋糕卷（实做第一版）",
+    "category": "蛋糕",
+    "ingredients": [
+      "鸡蛋 5个",
+      "低筋面粉 70g",
+      "玉米油 50g",
+      "Twin Swans Pandan Leaves Extract 约60g",
+      "椰浆 约20–25g",
+      "糖 40g"
+    ],
+    "steps": [
+      {
+        "text": "将蛋黄和蛋清分离，蛋清放入冷冻。",
+        "minutes": 0
+      },
+      {
+        "text": "蛋黄加入玉米油、Twin Swans Pandan Leaves Extract和椰浆，搅拌均匀后筛入低筋面粉，混合均匀。",
+        "minutes": 10
+      },
+      {
+        "text": "期间将蛋清加入糖打发。",
+        "minutes": 10
+      },
+      {
+        "text": "将蛋白霜与蛋黄糊翻拌混合均匀，倒入烤盘。",
+        "minutes": 0
+      },
+      {
+        "text": "以280°F烘烤50分钟。",
+        "minutes": 50
+      }
+    ],
+    "notes": "2026年10月18日实做第一版。未加牛奶。斑斓液使用 Twin Swans Pandan Leaves Extract。成品绿色不明显。"
   }
 ]
